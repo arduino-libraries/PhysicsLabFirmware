@@ -110,15 +110,14 @@ Data format: 32-bit IEEE float (little endian)
 Description: Resistance input value in ohms, if subscribed notification sent every 100 ms
 Notes: Faked as counter in current version
 
-Accelerometer Characteristic
+Acceleration Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 UUID:       555a0001-5001-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 12 bytes
 Data format: Array of 3 x 32-bit IEEE floats (little endian)
-Description: X, Y, Z acceleration values in G's, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
+Description: X, Y, Z acceleration values in G's, if subscribed notification sent every 10 ms
 
 Gyroscope Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -127,15 +126,13 @@ UUID:       555a0001-5002-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 12 bytes
 Data format: Array of 3 x 32-bit IEEE floats (little endian)
-Description: X, Y, Z rotation values in degrees per second, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
+Description: X, Y, Z gyroscope values in degrees per second, if subscribed notification sent every 10 ms
 
-Magnetometer Characteristic
-~~~~~~~~~~~~~~~~~~~~~~~~
+Magnetic Field Characteristic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 UUID:       555a0001-5003-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 12 bytes
 Data format: Array of 3 x 32-bit IEEE floats (little endian)
-Description: X, Y, Z magnetor values in degrees per second, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
+Description: X, Y, Z magnetic fields values in uT, if subscribed notification sent every 10 ms

@@ -1,4 +1,5 @@
 #include <ArduinoBLE.h>
+#include <MKRIMU.h>
 
 #define SCIENCE_KIT_UUID(val) ("555a0001-" val "-467a-9538-01f0652c74e8")
 
@@ -13,9 +14,9 @@ BLEByteCharacteristic          ouput2Characteristic       (SCIENCE_KIT_UUID("300
 BLEFloatCharacteristic         voltageCharacteristic      (SCIENCE_KIT_UUID("4001"), BLENotify);
 BLEFloatCharacteristic         currentCharacteristic      (SCIENCE_KIT_UUID("4002"), BLENotify);
 BLEFloatCharacteristic         resistanceCharacteristic   (SCIENCE_KIT_UUID("4003"), BLENotify);
-BLECharacteristic              accelerometerCharacteristic(SCIENCE_KIT_UUID("5001"), BLENotify, 3 * sizeof(float));
+BLECharacteristic              accelerationCharacteristic (SCIENCE_KIT_UUID("5001"), BLENotify, 3 * sizeof(float));
 BLECharacteristic              gyroscopeCharacteristic    (SCIENCE_KIT_UUID("5002"), BLENotify, 3 * sizeof(float));
-BLECharacteristic              magnetometerCharacteristic (SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
+BLECharacteristic              magneticFieldCharacteristic(SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
 
 const int LED_PIN     =  0;
 const int INPUT1_PIN  = A0;
@@ -27,7 +28,6 @@ const int OUTPUT2_PIN =  5;
 String name;
 unsigned long lastNotify = 0;
 
-
 void setup() {
   Serial.begin(9600);
 
@@ -38,8 +38,16 @@ void setup() {
   pinMode(OUTPUT1_PIN, OUTPUT);
   pinMode(OUTPUT2_PIN, OUTPUT);
 
+  if (!IMU.begin()) {
+    Serial.println("Failled to initialized IMU!");
+
+    while (1);
+  }
+
   if (!BLE.begin()) {
     Serial.println("Failled to initialized BLE!");
+
+    while (1);
   }
 
   String address = BLE.address();
@@ -66,9 +74,9 @@ void setup() {
   service.addCharacteristic(voltageCharacteristic);
   service.addCharacteristic(currentCharacteristic);
   service.addCharacteristic(resistanceCharacteristic);
-  service.addCharacteristic(accelerometerCharacteristic);
+  service.addCharacteristic(accelerationCharacteristic);
   service.addCharacteristic(gyroscopeCharacteristic);
-  service.addCharacteristic(magnetometerCharacteristic);
+  service.addCharacteristic(magneticFieldCharacteristic);
 
   BLE.addService(service);
 
@@ -97,13 +105,10 @@ void loop() {
       // every 100ms update subscribed characteristics
       updateSubscribedCharacteristics();
     }
+
+    updateSubscribedIMUCharacteristics();
   }
 }
-
-// temporary variables
-float acceleration[3]  = {0, 0, 0};
-float rotation[3]      = {0, 0, 0};
-float magneticForce[3] = {0, 0, 0};
 
 void updateSubscribedCharacteristics() {
   if (input1Characteristic.subscribed()) {
@@ -132,31 +137,30 @@ void updateSubscribedCharacteristics() {
     // TODO: read from sensor
     resistanceCharacteristic.writeValue(resistanceCharacteristic.value() + 1);
   }
+}
 
-  if (accelerometerCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    acceleration[0]++;
-    acceleration[1]++;
-    acceleration[2]++;
+void updateSubscribedIMUCharacteristics() {
+  if (accelerationCharacteristic.subscribed()) {
+    float acceleration[3];
 
-    accelerometerCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
+    if (IMU.accelerationAvailable() && IMU.readAcceleration(acceleration[0], acceleration[1], acceleration[2])) {
+      accelerationCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
+    }
   }
 
   if (gyroscopeCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    rotation[0]++;
-    rotation[1]++;
-    rotation[2]++;
+    float gyroscope[3];
 
-    gyroscopeCharacteristic.writeValue((byte*)rotation, sizeof(rotation));
+    if (IMU.gyroscopeAvailable() && IMU.readGyroscope(gyroscope[0], gyroscope[1], gyroscope[2])) {
+      gyroscopeCharacteristic.writeValue((byte*)gyroscope, sizeof(gyroscope));
+    }
   }
 
-  if (magnetometerCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    magneticForce[0]++;
-    magneticForce[1]++;
-    magneticForce[2]++;
+  if (magneticFieldCharacteristic.subscribed()) {
+    float magneticField[3];
 
-    magnetometerCharacteristic.writeValue((byte*)magneticForce, sizeof(magneticForce));
+    if (IMU.magneticFieldAvailable() && IMU.readMagneticField(magneticField[0], magneticField[1], magneticField[2])) {
+      magneticFieldCharacteristic.writeValue((byte*)magneticField, sizeof(magneticField));
+    }
   }
 }
