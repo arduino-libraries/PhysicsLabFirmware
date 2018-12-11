@@ -1,20 +1,21 @@
 #include <ArduinoBLE.h>
 
-BLEService                     service                    ("555a0001-0000-467a-9538-01f0652c74e8");
-BLEUnsignedIntCharacteristic   versionCharacteristic      ("555a0001-0001-467a-9538-01f0652c74e8", BLERead);
-BLEByteCharacteristic          ledCharacteristic          ("555a0001-0002-467a-9538-01f0652c74e8", BLERead | BLEWrite);
-BLEUnsignedShortCharacteristic input1Characteristic       ("555a0001-0003-467a-9538-01f0652c74e8", BLENotify);
-BLEUnsignedShortCharacteristic input2Characteristic       ("555a0001-0004-467a-9538-01f0652c74e8", BLENotify);
-BLEUnsignedShortCharacteristic input3Characteristic       ("555a0001-0005-467a-9538-01f0652c74e8", BLENotify);
-BLEByteCharacteristic          ouput1Characteristic       ("555a0001-0006-467a-9538-01f0652c74e8", BLERead | BLEWrite);
-BLEByteCharacteristic          ouput2Characteristic       ("555a0001-0007-467a-9538-01f0652c74e8", BLERead | BLEWrite);
-BLEFloatCharacteristic         voltageCharacteristic      ("555a0001-0008-467a-9538-01f0652c74e8", BLENotify);
-BLEFloatCharacteristic         currentCharacteristic      ("555a0001-0009-467a-9538-01f0652c74e8", BLENotify);
-BLEFloatCharacteristic         resistanceCharacteristic   ("555a0001-000a-467a-9538-01f0652c74e8", BLENotify);
-BLEFloatCharacteristic         temperatureCharacteristic  ("555a0001-000b-467a-9538-01f0652c74e8", BLENotify);
-BLECharacteristic              accelerometerCharacteristic("555a0001-000c-467a-9538-01f0652c74e8", BLENotify, 3 * sizeof(float));
-BLECharacteristic              gyroscopeCharacteristic    ("555a0001-000d-467a-9538-01f0652c74e8", BLENotify, 3 * sizeof(float));
-BLECharacteristic              magnetometerCharacteristic ("555a0001-000e-467a-9538-01f0652c74e8", BLENotify, 3 * sizeof(float));
+#define SCIENCE_KIT_UUID(val) ("555a0001-" val "-467a-9538-01f0652c74e8")
+
+BLEService                     service                    (SCIENCE_KIT_UUID("0000"));
+BLEUnsignedIntCharacteristic   versionCharacteristic      (SCIENCE_KIT_UUID("0001"), BLERead);
+BLEByteCharacteristic          ledCharacteristic          (SCIENCE_KIT_UUID("1001"), BLERead | BLEWrite);
+BLEUnsignedShortCharacteristic input1Characteristic       (SCIENCE_KIT_UUID("2001"), BLENotify);
+BLEUnsignedShortCharacteristic input2Characteristic       (SCIENCE_KIT_UUID("2002"), BLENotify);
+BLEUnsignedShortCharacteristic input3Characteristic       (SCIENCE_KIT_UUID("2002"), BLENotify);
+BLEByteCharacteristic          ouput1Characteristic       (SCIENCE_KIT_UUID("3001"), BLERead | BLEWrite);
+BLEByteCharacteristic          ouput2Characteristic       (SCIENCE_KIT_UUID("3001"), BLERead | BLEWrite);
+BLEFloatCharacteristic         voltageCharacteristic      (SCIENCE_KIT_UUID("4001"), BLENotify);
+BLEFloatCharacteristic         currentCharacteristic      (SCIENCE_KIT_UUID("4002"), BLENotify);
+BLEFloatCharacteristic         resistanceCharacteristic   (SCIENCE_KIT_UUID("4003"), BLENotify);
+BLECharacteristic              accelerometerCharacteristic(SCIENCE_KIT_UUID("5001"), BLENotify, 3 * sizeof(float));
+BLECharacteristic              gyroscopeCharacteristic    (SCIENCE_KIT_UUID("5002"), BLENotify, 3 * sizeof(float));
+BLECharacteristic              magnetometerCharacteristic (SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
 
 const int LED_PIN     =  0;
 const int INPUT1_PIN  = A0;
@@ -65,7 +66,6 @@ void setup() {
   service.addCharacteristic(voltageCharacteristic);
   service.addCharacteristic(currentCharacteristic);
   service.addCharacteristic(resistanceCharacteristic);
-  service.addCharacteristic(temperatureCharacteristic);
   service.addCharacteristic(accelerometerCharacteristic);
   service.addCharacteristic(gyroscopeCharacteristic);
   service.addCharacteristic(magnetometerCharacteristic);
@@ -131,11 +131,6 @@ void updateSubscribedCharacteristics() {
   if (resistanceCharacteristic.subscribed()) {
     // TODO: read from sensor
     resistanceCharacteristic.writeValue(resistanceCharacteristic.value() + 1);
-  }
-
-  if (temperatureCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    temperatureCharacteristic.writeValue(temperatureCharacteristic.value() + 1);
   }
 
   if (accelerometerCharacteristic.subscribed()) {

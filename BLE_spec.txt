@@ -29,7 +29,7 @@ Description: Version of firmware
 LED Characteristic
 ~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0002-467a-9538-01f0652c74e8
+UUID:       555a0001-1001-467a-9538-01f0652c74e8
 Properties: read, write
 Value size: 1 byte
 Data format: 8-bit unsigned integer
@@ -38,7 +38,7 @@ Description: LED brightness, 0 = off, 255 = full, 1 - 254 brightness
 Input 1 Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0003-467a-9538-01f0652c74e8
+UUID:       555a0001-2001-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 2 bytes
 Data format: 16-bit unsigned integer (little endian)
@@ -47,7 +47,7 @@ Description: Input 1 analog value (0 - 1023), if subscribed notification sent ev
 Input 2 Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0004-467a-9538-01f0652c74e8
+UUID:       555a0001-2002-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 2 bytes
 Data format: 16-bit unsigned integer (little endian)
@@ -56,7 +56,7 @@ Description: Input 2 analog value (0 - 1023), if subscribed notification sent ev
 Input 3 Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0005-467a-9538-01f0652c74e8
+UUID:       555a0001-2003-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 2 bytes
 Data format: 16-bit unsigned integer (little endian)
@@ -65,7 +65,7 @@ Description: Input 3 analog value (0 - 1023), if subscribed notification sent ev
 Output 1 Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0006-467a-9538-01f0652c74e8
+UUID:       555a0001-3001-467a-9538-01f0652c74e8
 Properties: read, write
 Value size: 1 byte
 Data format: 8-bit unsigned integer
@@ -74,7 +74,7 @@ Description: Analog write value of Output 1
 Output 2 Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0007-467a-9538-01f0652c74e8
+UUID:       555a0001-3002-467a-9538-01f0652c74e8
 Properties: read, write
 Value size: 1 byte
 Data format: 8-bit unsigned integer
@@ -83,7 +83,7 @@ Description: Analog write value of Output 2
 Voltage Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0008-467a-9538-01f0652c74e8
+UUID:       555a0001-4001-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 4 bytes
 Data format: 32-bit IEEE float (little endian)
@@ -93,7 +93,7 @@ Notes: Faked as counter in current version
 Current Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-0009-467a-9538-01f0652c74e8
+UUID:       555a0001-4002-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 4 bytes
 Data format: 32-bit IEEE float (little endian)
@@ -103,27 +103,17 @@ Notes: Faked as counter in current version
 Resistance Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-000a-467a-9538-01f0652c74e8
+UUID:       555a0001-4003-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 4 bytes
 Data format: 32-bit IEEE float (little endian)
 Description: Resistance input value in ohms, if subscribed notification sent every 100 ms
 Notes: Faked as counter in current version
 
-Temperature Characteristic
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-UUID:       555a0001-000b-467a-9538-01f0652c74e8
-Properties: notify
-Value size: 4 bytes
-Data format: 32-bit IEEE float (little endian)
-Description: Temperature sensor value in degress Celcius, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
-
 Accelerometer Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-000c-467a-9538-01f0652c74e8
+UUID:       555a0001-5001-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 12 bytes
 Data format: Array of 3 x 32-bit IEEE floats (little endian)
@@ -133,7 +123,7 @@ Notes: Faked as counter in current version
 Gyroscope Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-000d-467a-9538-01f0652c74e8
+UUID:       555a0001-5002-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 12 bytes
 Data format: Array of 3 x 32-bit IEEE floats (little endian)
@@ -143,7 +133,7 @@ Notes: Faked as counter in current version
 Magnetometer Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-UUID:       555a0001-000e-467a-9538-01f0652c74e8
+UUID:       555a0001-5003-467a-9538-01f0652c74e8
 Properties: notify
 Value size: 12 bytes
 Data format: Array of 3 x 32-bit IEEE floats (little endian)
