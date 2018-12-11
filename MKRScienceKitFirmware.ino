@@ -18,12 +18,13 @@ BLECharacteristic              accelerationCharacteristic (SCIENCE_KIT_UUID("500
 BLECharacteristic              gyroscopeCharacteristic    (SCIENCE_KIT_UUID("5002"), BLENotify, 3 * sizeof(float));
 BLECharacteristic              magneticFieldCharacteristic(SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
 
-const int LED_PIN     =  0;
-const int INPUT1_PIN  = A0;
-const int INPUT2_PIN  = A1;
-const int INPUT3_PIN  = A3;
-const int OUTPUT1_PIN =  1;
-const int OUTPUT2_PIN =  5;
+const int LED_PIN        =  0;
+const int INPUT1_PIN     = A0;
+const int INPUT2_PIN     = A1;
+const int INPUT3_PIN     = A3;
+const int OUTPUT1_PIN    =  1;
+const int OUTPUT2_PIN    =  5;
+const int RESISTANCE_PIN = A2;
 
 String name;
 unsigned long lastNotify = 0;
@@ -134,8 +135,10 @@ void updateSubscribedCharacteristics() {
   }
 
   if (resistanceCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    resistanceCharacteristic.writeValue(resistanceCharacteristic.value() + 1);
+    float Vout = (analogRead(RESISTANCE_PIN) * 3.30) / 1023.0;
+    float resistance = 4.7e3 * ((3.3 / Vout) - 1);
+
+    resistanceCharacteristic.writeValue(resistance);
   }
 }
 
