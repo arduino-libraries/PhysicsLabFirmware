@@ -1,6 +1,8 @@
 #include <ArduinoBLE.h>
 #include <MKRIMU.h>
 
+#include "INA226.h"
+
 #define SCIENCE_KIT_UUID(val) ("555a0001-" val "-467a-9538-01f0652c74e8")
 
 BLEService                     service                    (SCIENCE_KIT_UUID("0000"));
@@ -38,6 +40,12 @@ void setup() {
   pinMode(INPUT3_PIN, INPUT);
   pinMode(OUTPUT1_PIN, OUTPUT);
   pinMode(OUTPUT2_PIN, OUTPUT);
+
+  if (!INA226.begin(0x45)) {
+    Serial.println("Failled to initialized INA226!");
+
+    while (1);
+  }
 
   if (!IMU.begin()) {
     Serial.println("Failled to initialized IMU!");
@@ -125,13 +133,15 @@ void updateSubscribedCharacteristics() {
   }
 
   if (voltageCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    voltageCharacteristic.writeValue(voltageCharacteristic.value() + 1);
+    float voltage = INA226.readBusVoltage();
+
+    voltageCharacteristic.writeValue(voltage);
   }
 
   if (currentCharacteristic.subscribed()) {
-    // TODO: read from sensor
-    currentCharacteristic.writeValue(currentCharacteristic.value() + 1);
+    float current = INA226.readCurrent();
+
+    currentCharacteristic.writeValue(current);
   }
 
   if (resistanceCharacteristic.subscribed()) {
