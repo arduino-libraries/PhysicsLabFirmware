@@ -88,7 +88,6 @@ Properties: notify
 Value size: 4 bytes
 Data format: 32-bit IEEE float (little endian)
 Description: Voltage input value in volts, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
 
 Current Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -98,7 +97,6 @@ Properties: notify
 Value size: 4 bytes
 Data format: 32-bit IEEE float (little endian)
 Description: Current input value in amps, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
 
 Resistance Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,7 +106,6 @@ Properties: notify
 Value size: 4 bytes
 Data format: 32-bit IEEE float (little endian)
 Description: Resistance input value in ohms, if subscribed notification sent every 100 ms
-Notes: Faked as counter in current version
 
 Acceleration Characteristic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
