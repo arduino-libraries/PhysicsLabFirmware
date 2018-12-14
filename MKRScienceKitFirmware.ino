@@ -110,7 +110,9 @@ void loop() {
 
     unsigned long now = millis();
 
-    if (abs(now - lastNotify) >= 100) {
+    if (abs((long)now - (long)lastNotify) >= 100) {
+      lastNotify = now;
+      
       // every 100ms update subscribed characteristics
       updateSubscribedCharacteristics();
     }
