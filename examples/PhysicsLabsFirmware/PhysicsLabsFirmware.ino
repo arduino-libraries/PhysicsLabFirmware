@@ -40,12 +40,13 @@ BLECharacteristic              gyroscopeCharacteristic    (SCIENCE_KIT_UUID("500
 BLECharacteristic              magneticFieldCharacteristic(SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
 
 const int LED_PIN        =  0;
-const int INPUT1_PIN     = A0;
+const int INPUT1_PIN     = A3;
 const int INPUT2_PIN     = A1;
-const int INPUT3_PIN     = A3;
-const int OUTPUT1_PIN    =  1;
-const int OUTPUT2_PIN    =  5;
+const int INPUT3_PIN     = A0;
+const int OUTPUT1_PIN    =  5;
+const int OUTPUT2_PIN    =  1;
 const int RESISTANCE_PIN = A2;
+const int RESISTANCE_AUX = 13;
 
 String name;
 unsigned long lastNotify = 0;
@@ -59,6 +60,9 @@ void setup() {
   pinMode(INPUT3_PIN, INPUT);
   pinMode(OUTPUT1_PIN, OUTPUT);
   pinMode(OUTPUT2_PIN, OUTPUT);
+  pinMode(RESISTANCE_AUX, OUTPUT);
+  
+  digitalWrite(RESISTANCE_AUX, LOW);
 
   if (!INA226.begin(0x45)) {
     Serial.println("Failled to initialized INA226!");
@@ -167,7 +171,7 @@ void updateSubscribedCharacteristics() {
 
   if (resistanceCharacteristic.subscribed()) {
     float Vout = (analogRead(RESISTANCE_PIN) * 3.30) / 1023.0;
-    float resistance = 4.7e3 * ((3.3 / Vout) - 1);
+    float resistance = 4.7e4 * ((3.3 / Vout) - 1);
 
     resistanceCharacteristic.writeValue(resistance);
   }
