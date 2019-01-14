@@ -39,20 +39,29 @@ BLECharacteristic              accelerationCharacteristic (SCIENCE_KIT_UUID("500
 BLECharacteristic              gyroscopeCharacteristic    (SCIENCE_KIT_UUID("5002"), BLENotify, 3 * sizeof(float));
 BLECharacteristic              magneticFieldCharacteristic(SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
 
-const int LED_PIN        =  0;
-const int INPUT1_PIN     = A3;
-const int INPUT2_PIN     = A1;
-const int INPUT3_PIN     = A0;
-const int OUTPUT1_PIN    =  5;
-const int OUTPUT2_PIN    =  1;
-const int RESISTANCE_PIN = A2;
-const int RESISTANCE_AUX = 13;
+const int LED_PIN            =  0;
+const int INPUT1_PIN         = A3;
+const int INPUT2_PIN         = A1;
+const int INPUT3_PIN         = A0;
+const int OUTPUT1_PIN        =  5;
+const int OUTPUT2_PIN        =  1;
+const int RESISTANCE_PIN     = A2;
+const int RESISTANCE_AUX_PIN = 13;
 
 String name;
 unsigned long lastNotify = 0;
 
+#define RESISTOR_AUX_LOW  47000.0
+#define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
+
+//#define DEBUG //uncomment to debug the code :)
+
 void setup() {
   Serial.begin(9600);
+#ifdef DEBUG
+  while (!Serial);
+  Serial.println("Started");
+#endif
 
   pinMode(LED_PIN, OUTPUT);
   pinMode(INPUT1_PIN, INPUT);
@@ -60,9 +69,9 @@ void setup() {
   pinMode(INPUT3_PIN, INPUT);
   pinMode(OUTPUT1_PIN, OUTPUT);
   pinMode(OUTPUT2_PIN, OUTPUT);
-  pinMode(RESISTANCE_AUX, OUTPUT);
-  
-  digitalWrite(RESISTANCE_AUX, LOW);
+  pinMode(RESISTANCE_AUX_PIN, OUTPUT);
+
+  digitalWrite(RESISTANCE_AUX_PIN, LOW);
 
   if (!INA226.begin(0x45)) {
     Serial.println("Failled to initialized INA226!");
@@ -135,7 +144,7 @@ void loop() {
 
     if (abs((long)now - (long)lastNotify) >= 100) {
       lastNotify = now;
-      
+
       // every 100ms update subscribed characteristics
       updateSubscribedCharacteristics();
     }
@@ -170,11 +179,63 @@ void updateSubscribedCharacteristics() {
   }
 
   if (resistanceCharacteristic.subscribed()) {
-    float Vout = (analogRead(RESISTANCE_PIN) * 3.30) / 1023.0;
-    float resistance = 4.7e4 * ((3.3 / Vout) - 1);
+    float Vout = 0;
+    float resistanceAuxLow = INFINITY;
+    float resistanceAuxHigh = INFINITY;
+    float resistanceAvg = INFINITY; //open circuit as default
 
-    resistanceCharacteristic.writeValue(resistance);
+    digitalWrite(RESISTANCE_AUX_PIN, LOW);
+    Vout = getVoutAverage();
+    if (Vout >= 0.1) {
+      resistanceAuxLow = RESISTOR_AUX_LOW * ((3.3 / Vout) - 1);
+    }
+
+    digitalWrite(RESISTANCE_AUX_PIN, HIGH);
+    Vout = getVoutAverage();
+    if (Vout >= 0.1) {
+      resistanceAuxHigh = RESISTOR_AUX_HIGH * ((3.3 / Vout) - 1);
+    }
+
+#ifdef DEBUG
+    Serial.print("Resistance (HIGH): ");
+    Serial.print(resistanceAuxHigh);
+    Serial.println(" Ohm");
+
+    Serial.print("Resistance (LOW): ");
+    Serial.print(resistanceAuxLow);
+    Serial.println(" Ohm");
+#endif
+
+    if ((resistanceAuxHigh != INFINITY) && (resistanceAuxLow != INFINITY)) {
+      resistanceAvg = (resistanceAuxHigh + resistanceAuxLow) / 2;
+    } else if ((resistanceAuxHigh != INFINITY) && (resistanceAuxLow == INFINITY)) {
+      resistanceAvg = resistanceAuxHigh;
+    } else if ((resistanceAuxHigh == INFINITY) && (resistanceAuxLow != INFINITY)) {
+      resistanceAvg = resistanceAuxLow;
+    }
+    
+#ifdef DEBUG
+    Serial.print("Resistance (AVG): ");
+    Serial.print(resistanceAvg);
+    Serial.println(" Ohm");
+#endif
+    resistanceCharacteristic.writeValue(resistanceAvg);
   }
+}
+
+float getVoutAverage() {
+  float Vout = 0;
+  for (int i = 0; i < 30; i++) {
+    Vout += (analogRead(RESISTANCE_PIN) * 3.30) / 1023.0;
+  }
+  Vout /= 30;
+
+#ifdef DEBUG
+  Serial.print("Vout: ");
+  Serial.print(Vout);
+  Serial.println("V");
+#endif
+  return Vout;
 }
 
 int analogReadAverage(int pin, int numberOfSamples) {
