@@ -146,15 +146,15 @@ void loop() {
 
 void updateSubscribedCharacteristics() {
   if (input1Characteristic.subscribed()) {
-    input1Characteristic.writeValue(analogRead(INPUT1_PIN));
+    input1Characteristic.writeValue(analogReadAverage(INPUT1_PIN, 30));
   }
 
   if (input2Characteristic.subscribed()) {
-    input2Characteristic.writeValue(analogRead(INPUT2_PIN));
+    input2Characteristic.writeValue(analogReadAverage(INPUT2_PIN, 30));
   }
 
   if (input3Characteristic.subscribed()) {
-    input3Characteristic.writeValue(analogRead(INPUT3_PIN));
+    input3Characteristic.writeValue(analogReadAverage(INPUT3_PIN, 30));
   }
 
   if (voltageCharacteristic.subscribed()) {
@@ -175,6 +175,15 @@ void updateSubscribedCharacteristics() {
 
     resistanceCharacteristic.writeValue(resistance);
   }
+}
+
+int analogReadAverage(int pin, int numberOfSamples) {
+  int averageValue = 0;
+  for (int i = 0; i < numberOfSamples; i++) {
+    averageValue += analogRead(pin);
+  }
+
+  return (averageValue / numberOfSamples);
 }
 
 void updateSubscribedIMUCharacteristics() {
