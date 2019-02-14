@@ -17,8 +17,9 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <ArduinoBLE.h>
-#include <MKRIMU.h>
+#include <ArduinoBLE.h>       // click here to install the library: http://librarymanager#ArduinoBLE
+#include <Adafruit_LSM9DS1.h> // click here to install the library: http://librarymanager#Adafruit_LSM9DS1
+#include <Adafruit_Sensor.h>  // click here to install the library: http://librarymanager#Adafruit_Sensor
 
 #include "INA226.h"
 
@@ -56,6 +57,8 @@ unsigned long lastNotify = 0;
 
 //#define DEBUG //uncomment to debug the code :)
 
+Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
+
 void setup() {
   Serial.begin(9600);
 #ifdef DEBUG
@@ -79,11 +82,15 @@ void setup() {
     while (1);
   }
 
-  if (!IMU.begin()) {
+  if (!imu.begin()) {
     Serial.println("Failled to initialized IMU!");
 
     while (1);
   }
+
+  imu.setupAccel(imu.LSM9DS1_ACCELRANGE_2G);
+  imu.setupMag(imu.LSM9DS1_MAGGAIN_4GAUSS);
+  imu.setupGyro(imu.LSM9DS1_GYROSCALE_245DPS);
 
   if (!BLE.begin()) {
     Serial.println("Failled to initialized BLE!");
@@ -213,7 +220,7 @@ void updateSubscribedCharacteristics() {
     } else if ((resistanceAuxHigh == INFINITY) && (resistanceAuxLow != INFINITY)) {
       resistanceAvg = resistanceAuxLow;
     }
-    
+
 #ifdef DEBUG
     Serial.print("Resistance (AVG): ");
     Serial.print(resistanceAvg);
@@ -248,27 +255,35 @@ int analogReadAverage(int pin, int numberOfSamples) {
 }
 
 void updateSubscribedIMUCharacteristics() {
+
+  imu.read();
+  sensors_event_t a, m, g, temp;
+  imu.getEvent(&a, &m, &g, &temp);
+
   if (accelerationCharacteristic.subscribed()) {
     float acceleration[3];
 
-    if (IMU.accelerationAvailable() && IMU.readAcceleration(acceleration[0], acceleration[1], acceleration[2])) {
-      accelerationCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
-    }
+    acceleration[0] = a.acceleration.x;
+    acceleration[1] = a.acceleration.y;
+    acceleration[2] = a.acceleration.z;
+    accelerationCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
   }
 
   if (gyroscopeCharacteristic.subscribed()) {
     float gyroscope[3];
 
-    if (IMU.gyroscopeAvailable() && IMU.readGyroscope(gyroscope[0], gyroscope[1], gyroscope[2])) {
-      gyroscopeCharacteristic.writeValue((byte*)gyroscope, sizeof(gyroscope));
-    }
+    gyroscope[0] = g.gyro.x;
+    gyroscope[1] = g.gyro.y;
+    gyroscope[2] = g.gyro.z;
+    gyroscopeCharacteristic.writeValue((byte*)gyroscope, sizeof(gyroscope));
   }
 
   if (magneticFieldCharacteristic.subscribed()) {
     float magneticField[3];
 
-    if (IMU.magneticFieldAvailable() && IMU.readMagneticField(magneticField[0], magneticField[1], magneticField[2])) {
-      magneticFieldCharacteristic.writeValue((byte*)magneticField, sizeof(magneticField));
-    }
+    magneticField[0] = m.magnetic.x;
+    magneticField[1] = m.magnetic.y;
+    magneticField[2] = m.magnetic.z;
+    magneticFieldCharacteristic.writeValue((byte*)magneticField, sizeof(magneticField));
   }
 }
