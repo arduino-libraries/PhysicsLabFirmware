@@ -1,5 +1,5 @@
 /*
-  This file is part of the PhysicsLabsFirmware library.
+  This file is part of the PhysicsLabFirmware library.
   Copyright (c) 2019 Arduino SA. All rights reserved.
 
   This library is free software; you can redistribute it and/or

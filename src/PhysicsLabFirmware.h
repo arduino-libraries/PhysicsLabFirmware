@@ -1,5 +1,5 @@
 /*
-  This file is part of the PhysicsLabsFirmware library.
+  This file is part of the PhysicsLabFirmware library.
   Copyright (c) 2019 Arduino SA. All rights reserved.
 
   This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _PHYSICS_LABS_FIRMWARE_H_
-#define _PHYSICS_LABS_FIRMWARE_H_
+#ifndef _PHYSICS_LAB_FIRMWARE_H_
+#define _PHYSICS_LAB_FIRMWARE_H_
 
 // Nothing here everything is in the example sketch!
 
