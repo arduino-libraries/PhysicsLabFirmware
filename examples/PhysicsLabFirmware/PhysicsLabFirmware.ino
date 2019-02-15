@@ -47,7 +47,7 @@ const int INPUT3_PIN         = A0;
 const int OUTPUT1_PIN        =  5;
 const int OUTPUT2_PIN        =  1;
 const int RESISTANCE_PIN     = A2;
-const int RESISTANCE_AUX_PIN = 13;
+const int RESISTANCE_AUX_PIN =  8;
 
 String name;
 unsigned long lastNotify = 0;
