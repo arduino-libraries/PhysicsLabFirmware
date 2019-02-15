@@ -18,8 +18,8 @@
 */
 
 #include <ArduinoBLE.h>       // click here to install the library: http://librarymanager#ArduinoBLE
-#include <Adafruit_LSM9DS1.h> // click here to install the library: http://librarymanager#Adafruit_LSM9DS1
-#include <Adafruit_Sensor.h>  // click here to install the library: http://librarymanager#Adafruit_Sensor
+#include <Adafruit_LSM9DS1.h> // click here to install the library: http://librarymanager#Adafruit&LSM9DS1
+#include <Adafruit_Sensor.h>  // click here to install the library: http://librarymanager#Adafruit&unified&Sensor&abstraction
 
 #include "INA226.h"
 
