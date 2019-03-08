@@ -55,7 +55,7 @@ unsigned long lastNotify = 0;
 #define RESISTOR_AUX_LOW  47000.0
 #define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
 
-//#define DEBUG //uncomment to debug the code :)
+#define DEBUG //uncomment to debug the code :)
 
 Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
 
@@ -193,7 +193,7 @@ void updateSubscribedCharacteristics() {
 
     digitalWrite(RESISTANCE_AUX_PIN, LOW);
     Vout = getVoutAverage();
-    if (Vout >= 0.1) {
+    if ((Vout >= 0.1) && (Vout <= 3.0)) {
       resistanceAuxLow = RESISTOR_AUX_LOW * ((3.3 / Vout) - 1);
     }
 
@@ -220,6 +220,7 @@ void updateSubscribedCharacteristics() {
     } else if ((resistanceAuxHigh == INFINITY) && (resistanceAuxLow != INFINITY)) {
       resistanceAvg = resistanceAuxLow;
     }
+    resistanceAvg += 0.025 * resistanceAvg;
 
 #ifdef DEBUG
     Serial.print("Resistance (AVG): ");
