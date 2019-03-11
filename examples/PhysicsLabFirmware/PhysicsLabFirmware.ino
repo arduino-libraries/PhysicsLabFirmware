@@ -57,7 +57,7 @@ unsigned long imuTime;
 #define RESISTOR_AUX_LOW  47000.0
 #define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
 
-#define IMU_UPDATE_TIME 100
+#define IMU_UPDATE_TIME 50
 
 //#define DEBUG //uncomment to debug the code :)
 
