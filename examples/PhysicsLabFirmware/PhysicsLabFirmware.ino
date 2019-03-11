@@ -55,7 +55,7 @@ unsigned long lastNotify = 0;
 #define RESISTOR_AUX_LOW  47000.0
 #define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
 
-#define DEBUG //uncomment to debug the code :)
+//#define DEBUG //uncomment to debug the code :)
 
 Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
 
