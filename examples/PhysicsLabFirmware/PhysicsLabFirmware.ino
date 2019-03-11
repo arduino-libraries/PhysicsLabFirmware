@@ -52,8 +52,12 @@ const int RESISTANCE_AUX_PIN =  8;
 String name;
 unsigned long lastNotify = 0;
 
+unsigned long imuTime;
+
 #define RESISTOR_AUX_LOW  47000.0
 #define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
+
+#define IMU_UPDATE_TIME 100
 
 //#define DEBUG //uncomment to debug the code :)
 
@@ -129,6 +133,7 @@ void setup() {
   BLE.addService(service);
 
   BLE.advertise();
+  imuTime = millis();
 }
 
 void loop() {
@@ -256,35 +261,37 @@ int analogReadAverage(int pin, int numberOfSamples) {
 }
 
 void updateSubscribedIMUCharacteristics() {
+  if (millis() - imuTime > IMU_UPDATE_TIME) {
+    imuTime = millis();
+    imu.read();
+    sensors_event_t a, m, g, temp;
+    imu.getEvent(&a, &m, &g, &temp);
 
-  imu.read();
-  sensors_event_t a, m, g, temp;
-  imu.getEvent(&a, &m, &g, &temp);
+    if (accelerationCharacteristic.subscribed()) {
+      float acceleration[3];
 
-  if (accelerationCharacteristic.subscribed()) {
-    float acceleration[3];
+      acceleration[0] = a.acceleration.x;
+      acceleration[1] = a.acceleration.y;
+      acceleration[2] = a.acceleration.z;
+      accelerationCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
+    }
 
-    acceleration[0] = a.acceleration.x;
-    acceleration[1] = a.acceleration.y;
-    acceleration[2] = a.acceleration.z;
-    accelerationCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
-  }
+    if (gyroscopeCharacteristic.subscribed()) {
+      float gyroscope[3];
 
-  if (gyroscopeCharacteristic.subscribed()) {
-    float gyroscope[3];
+      gyroscope[0] = g.gyro.x;
+      gyroscope[1] = g.gyro.y;
+      gyroscope[2] = g.gyro.z;
+      gyroscopeCharacteristic.writeValue((byte*)gyroscope, sizeof(gyroscope));
+    }
 
-    gyroscope[0] = g.gyro.x;
-    gyroscope[1] = g.gyro.y;
-    gyroscope[2] = g.gyro.z;
-    gyroscopeCharacteristic.writeValue((byte*)gyroscope, sizeof(gyroscope));
-  }
+    if (magneticFieldCharacteristic.subscribed()) {
+      float magneticField[3];
 
-  if (magneticFieldCharacteristic.subscribed()) {
-    float magneticField[3];
-
-    magneticField[0] = m.magnetic.x;
-    magneticField[1] = m.magnetic.y;
-    magneticField[2] = m.magnetic.z;
-    magneticFieldCharacteristic.writeValue((byte*)magneticField, sizeof(magneticField));
+      magneticField[0] = m.magnetic.x;
+      magneticField[1] = m.magnetic.y;
+      magneticField[2] = m.magnetic.z;
+      magneticFieldCharacteristic.writeValue((byte*)magneticField, sizeof(magneticField));
+    }
   }
 }
