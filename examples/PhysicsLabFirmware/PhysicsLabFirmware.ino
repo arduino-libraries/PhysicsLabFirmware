@@ -17,8 +17,9 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <ArduinoBLE.h>
-#include <MKRIMU.h>
+#include <ArduinoBLE.h>       // click here to install the library: http://librarymanager#ArduinoBLE
+#include <Adafruit_LSM9DS1.h> // click here to install the library: http://librarymanager#Adafruit&LSM9DS1
+#include <Adafruit_Sensor.h>  // click here to install the library: http://librarymanager#Adafruit&unified&Sensor&abstraction
 
 #include "INA226.h"
 
@@ -46,15 +47,21 @@ const int INPUT3_PIN         = A0;
 const int OUTPUT1_PIN        =  5;
 const int OUTPUT2_PIN        =  1;
 const int RESISTANCE_PIN     = A2;
-const int RESISTANCE_AUX_PIN = 13;
+const int RESISTANCE_AUX_PIN =  8;
 
 String name;
 unsigned long lastNotify = 0;
 
+unsigned long imuTime;
+
 #define RESISTOR_AUX_LOW  47000.0
 #define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
 
+#define IMU_UPDATE_TIME 50
+
 //#define DEBUG //uncomment to debug the code :)
+
+Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
 
 void setup() {
   Serial.begin(9600);
@@ -79,11 +86,15 @@ void setup() {
     while (1);
   }
 
-  if (!IMU.begin()) {
+  if (!imu.begin()) {
     Serial.println("Failled to initialized IMU!");
 
     while (1);
   }
+
+  imu.setupAccel(imu.LSM9DS1_ACCELRANGE_2G);
+  imu.setupMag(imu.LSM9DS1_MAGGAIN_4GAUSS);
+  imu.setupGyro(imu.LSM9DS1_GYROSCALE_245DPS);
 
   if (!BLE.begin()) {
     Serial.println("Failled to initialized BLE!");
@@ -122,6 +133,7 @@ void setup() {
   BLE.addService(service);
 
   BLE.advertise();
+  imuTime = millis();
 }
 
 void loop() {
@@ -186,7 +198,7 @@ void updateSubscribedCharacteristics() {
 
     digitalWrite(RESISTANCE_AUX_PIN, LOW);
     Vout = getVoutAverage();
-    if (Vout >= 0.1) {
+    if ((Vout >= 0.1) && (Vout <= 3.0)) {
       resistanceAuxLow = RESISTOR_AUX_LOW * ((3.3 / Vout) - 1);
     }
 
@@ -213,7 +225,8 @@ void updateSubscribedCharacteristics() {
     } else if ((resistanceAuxHigh == INFINITY) && (resistanceAuxLow != INFINITY)) {
       resistanceAvg = resistanceAuxLow;
     }
-    
+    resistanceAvg += 0.025 * resistanceAvg;
+
 #ifdef DEBUG
     Serial.print("Resistance (AVG): ");
     Serial.print(resistanceAvg);
@@ -248,26 +261,36 @@ int analogReadAverage(int pin, int numberOfSamples) {
 }
 
 void updateSubscribedIMUCharacteristics() {
-  if (accelerationCharacteristic.subscribed()) {
-    float acceleration[3];
+  if (millis() - imuTime > IMU_UPDATE_TIME) {
+    imuTime = millis();
+    imu.read();
+    sensors_event_t a, m, g, temp;
+    imu.getEvent(&a, &m, &g, &temp);
 
-    if (IMU.accelerationAvailable() && IMU.readAcceleration(acceleration[0], acceleration[1], acceleration[2])) {
+    if (accelerationCharacteristic.subscribed()) {
+      float acceleration[3];
+
+      acceleration[0] = a.acceleration.x;
+      acceleration[1] = a.acceleration.y;
+      acceleration[2] = a.acceleration.z;
       accelerationCharacteristic.writeValue((byte*)acceleration, sizeof(acceleration));
     }
-  }
 
-  if (gyroscopeCharacteristic.subscribed()) {
-    float gyroscope[3];
+    if (gyroscopeCharacteristic.subscribed()) {
+      float gyroscope[3];
 
-    if (IMU.gyroscopeAvailable() && IMU.readGyroscope(gyroscope[0], gyroscope[1], gyroscope[2])) {
+      gyroscope[0] = g.gyro.x;
+      gyroscope[1] = g.gyro.y;
+      gyroscope[2] = g.gyro.z;
       gyroscopeCharacteristic.writeValue((byte*)gyroscope, sizeof(gyroscope));
     }
-  }
 
-  if (magneticFieldCharacteristic.subscribed()) {
-    float magneticField[3];
+    if (magneticFieldCharacteristic.subscribed()) {
+      float magneticField[3];
 
-    if (IMU.magneticFieldAvailable() && IMU.readMagneticField(magneticField[0], magneticField[1], magneticField[2])) {
+      magneticField[0] = m.magnetic.x;
+      magneticField[1] = m.magnetic.y;
+      magneticField[2] = m.magnetic.z;
       magneticFieldCharacteristic.writeValue((byte*)magneticField, sizeof(magneticField));
     }
   }
