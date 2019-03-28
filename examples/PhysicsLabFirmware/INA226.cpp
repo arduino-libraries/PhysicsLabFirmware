@@ -25,7 +25,7 @@
 
 INA226Class::INA226Class(TwoWire& wire) :
   _wire(&wire)
-{  
+{
 }
 
 INA226Class::~INA226Class()
@@ -41,10 +41,10 @@ int INA226Class::begin(uint8_t address, float shuntResistance)
 
   _wire->begin();
 
-  // force 
+  // force
   if (!writeRegister(INA226_CALIBRATION_REG, calibration)) {
     end();
-    
+
     return 0;
   }
 
@@ -63,7 +63,7 @@ float INA226Class::readCurrent()
   if (value == NAN) {
     return -1;
   }
-  
+
   return (((int16_t)value) / 1000.0);
 }
 
