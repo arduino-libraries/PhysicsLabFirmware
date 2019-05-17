@@ -59,6 +59,8 @@ unsigned long imuTime;
 
 #define IMU_UPDATE_TIME 50
 
+#define GSK_VERSION    2
+
 //#define DEBUG //uncomment to debug the code :)
 
 Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
@@ -134,6 +136,7 @@ void setup() {
 
   BLE.advertise();
   imuTime = millis();
+  versionCharacteristic.writeValue(GSK_VERSION);
 }
 
 void loop() {
