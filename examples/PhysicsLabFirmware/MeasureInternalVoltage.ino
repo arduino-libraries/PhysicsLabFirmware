@@ -5,6 +5,13 @@
  * 0x1B SCALEDIOVCC 1/4 scaled I/O supply
  */
 
+/*
+ * GATT specifications:
+ * Battery Level org.bluetooth.characteristic.battery_level  0x2A19  GSS
+ * Battery Level State org.bluetooth.characteristic.battery_level_state  0x2A1B  GSS
+ * Battery Power State org.bluetooth.characteristic.battery_power_state  0x2A1A  GSS
+ */
+
 
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncADC() __attribute__((always_inline, unused));

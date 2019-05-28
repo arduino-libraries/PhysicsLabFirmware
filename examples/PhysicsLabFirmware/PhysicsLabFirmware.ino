@@ -40,6 +40,9 @@ BLECharacteristic              accelerationCharacteristic (SCIENCE_KIT_UUID("500
 BLECharacteristic              gyroscopeCharacteristic    (SCIENCE_KIT_UUID("5002"), BLENotify, 3 * sizeof(float));
 BLECharacteristic              magneticFieldCharacteristic(SCIENCE_KIT_UUID("5003"), BLENotify, 3 * sizeof(float));
 
+BLEService                     batteryservice             ("0x180F");
+BLEByteCharacteristic          batteryLevel               ("0x2A19", BLENotify);
+
 const int LED_PIN            =  0;
 const int INPUT1_PIN         = A3;
 const int INPUT2_PIN         = A1;
@@ -62,6 +65,7 @@ unsigned long imuTime;
 #define GSK_VERSION    2
 
 #define MINIMUM_WORKING_CORE_VOLTAGE    3.0f
+#define NORMAL_WORKING_CORE_VOLTAGE     3.3f
 
 //#define DEBUG //uncomment to debug the code :)
 
@@ -134,7 +138,10 @@ void setup() {
   service.addCharacteristic(gyroscopeCharacteristic);
   service.addCharacteristic(magneticFieldCharacteristic);
 
+  batteryservice.addCharacteristic(batteryLevel);
+
   BLE.addService(service);
+  BLE.addService(batteryservice);
 
   BLE.advertise();
   imuTime = millis();
@@ -253,6 +260,15 @@ void updateSubscribedCharacteristics() {
     Serial.println(" Ohm");
 #endif
     resistanceCharacteristic.writeValue(resistanceAvg);
+  }
+
+  if (batteryLevel.subscribed()) {
+    float iovcc = getIoVcc();
+    if (iovcc < MINIMUM_WORKING_CORE_VOLTAGE) {
+      batteryLevel.writeValue(5);
+    } else {
+      batteryLevel.writeValue((uint8_t)((iovcc - MINIMUM_WORKING_CORE_VOLTAGE)*100/(NORMAL_WORKING_CORE_VOLTAGE - MINIMUM_WORKING_CORE_VOLTAGE)));
+    }
   }
 }
 
