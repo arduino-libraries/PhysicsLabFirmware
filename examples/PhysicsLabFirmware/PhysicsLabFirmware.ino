@@ -61,6 +61,8 @@ unsigned long imuTime;
 
 #define GSK_VERSION    2
 
+#define MINIMUM_WORKING_CORE_VOLTAGE    3.0f
+
 //#define DEBUG //uncomment to debug the code :)
 
 Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
@@ -139,8 +141,23 @@ void setup() {
   versionCharacteristic.writeValue(GSK_VERSION);
 }
 
+long lastVccMeasure = 0;
+
 void loop() {
   lastNotify = 0;
+
+  if (millis() - lastVccMeasure > 5000) {
+    if (getIoVcc() < MINIMUM_WORKING_CORE_VOLTAGE) {
+      pinMode(LED_BUILTIN, OUTPUT);
+      for (int i = 0; i < 10; i++) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(50);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(50);
+      }
+    }
+    lastVccMeasure = millis();
+  }
 
   while (BLE.connected()) {
     if (ledCharacteristic.written()) {
