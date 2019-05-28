@@ -64,8 +64,8 @@ unsigned long imuTime;
 
 #define GSK_VERSION    2
 
-#define MINIMUM_WORKING_CORE_VOLTAGE    3.0f
-#define NORMAL_WORKING_CORE_VOLTAGE     3.3f
+#define MINIMUM_WORKING_CORE_VOLTAGE    3.10f
+#define NORMAL_WORKING_CORE_VOLTAGE     3.30f
 
 //#define DEBUG //uncomment to debug the code :)
 
@@ -87,6 +87,16 @@ void setup() {
   pinMode(RESISTANCE_AUX_PIN, OUTPUT);
 
   digitalWrite(RESISTANCE_AUX_PIN, LOW);
+
+  if (getIoVcc() < MINIMUM_WORKING_CORE_VOLTAGE) {
+    pinMode(LED_BUILTIN, OUTPUT);
+    while (1) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(50);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(50);
+    }
+  }
 
   if (!INA226.begin(0x45)) {
     Serial.println("Failed to initialized INA226!");
