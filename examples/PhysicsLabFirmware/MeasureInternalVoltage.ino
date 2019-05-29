@@ -47,7 +47,7 @@ static uint32_t analogReadMux(uint32_t muxpos)
   // Clear the Data Ready flag
   ADC->INTFLAG.reg = ADC_INTFLAG_RESRDY;
 
-  // Start conversion again, since The first conversion after the reference is changed must not be used.
+  // Start conversion again, since the first conversion after the reference is changed must not be used.
   syncADC();
   ADC->SWTRIG.bit.START = 1;
 
