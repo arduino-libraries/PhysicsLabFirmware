@@ -20,6 +20,6 @@
 #ifndef _PHYSICS_LAB_FIRMWARE_H_
 #define _PHYSICS_LAB_FIRMWARE_H_
 
-// Nothing here everything is in the example sketch!
+// Nothing here. Everything is in the example sketch!
 
 #endif
