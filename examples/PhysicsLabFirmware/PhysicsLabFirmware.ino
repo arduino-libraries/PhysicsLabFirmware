@@ -55,11 +55,11 @@ unsigned long lastNotify = 0;
 unsigned long imuTime;
 
 #define RESISTOR_AUX_LOW  47000.0
-#define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 Ohm
+#define RESISTOR_AUX_HIGH 979.16 // 47k in parallel with 1k = 979.16 ohm
 
 #define IMU_UPDATE_TIME 50
 
-//#define DEBUG //uncomment to debug the code :)
+//#define DEBUG // uncomment to debug the code :)
 
 Adafruit_LSM9DS1 imu = Adafruit_LSM9DS1();
 
@@ -81,13 +81,13 @@ void setup() {
   digitalWrite(RESISTANCE_AUX_PIN, LOW);
 
   if (!INA226.begin(0x45)) {
-    Serial.println("Failled to initialized INA226!");
+    Serial.println("Failed to initialize INA226!");
 
     while (1);
   }
 
   if (!imu.begin()) {
-    Serial.println("Failled to initialized IMU!");
+    Serial.println("Failed to initialize IMU!");
 
     while (1);
   }
@@ -97,7 +97,7 @@ void setup() {
   imu.setupGyro(imu.LSM9DS1_GYROSCALE_245DPS);
 
   if (!BLE.begin()) {
-    Serial.println("Failled to initialized BLE!");
+    Serial.println("Failed to initialize BLE!");
 
     while (1);
   }
@@ -157,7 +157,7 @@ void loop() {
     if (abs((long)now - (long)lastNotify) >= 100) {
       lastNotify = now;
 
-      // every 100ms update subscribed characteristics
+      // every 100 ms update subscribed characteristics
       updateSubscribedCharacteristics();
     }
 
@@ -194,7 +194,7 @@ void updateSubscribedCharacteristics() {
     float Vout = 0;
     float resistanceAuxLow = INFINITY;
     float resistanceAuxHigh = INFINITY;
-    float resistanceAvg = INFINITY; //open circuit as default
+    float resistanceAvg = INFINITY; // open circuit as default
 
     digitalWrite(RESISTANCE_AUX_PIN, LOW);
     Vout = getVoutAverage();
